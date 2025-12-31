@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AutomationToolbox.Client/AutomationToolbox.Client.csproj" />
+    <Project Path="src/AutomationToolbox.Core/AutomationToolbox.Core.csproj" />
+    <Project Path="src/AutomationToolbox.Server/AutomationToolbox.Server.csproj" />
+    <Project Path="src/AutomationToolbox.Tests/AutomationToolbox.Tests.csproj" />
+  </Folder>
+</Solution>

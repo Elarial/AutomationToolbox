@@ -1,0 +1,79 @@
+@page "/tools/ip-scanner"
+@using AutomationToolbox.Core.Models
+@using AutomationToolbox.Client.Shared
+@inject HttpClient Http
+@inject Microsoft.Extensions.Localization.IStringLocalizer<App> Localizer
+
+<PageTitle>@Localizer["IpScannerTitle"]</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@Localizer["IpScannerTitle"]</h1>
+     <button class="btn btn-primary" @onclick="AddScanner">
+        <i class="fa-solid fa-plus"></i> @Localizer["AddScanner"]
+    </button>
+</div>
+
+@if (loadingInterfaces)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (interfaces != null)
+{
+    <div class="row">
+         @foreach (var scannerId in scanners)
+        {
+            <div class="col-12" @key="scannerId">
+                <IpScannerCard Id="@scannerId" AvailableInterfaces="@interfaces" OnRemove="() => RemoveScanner(scannerId)" />
+            </div>
+        }
+    </div>
+    
+     @if (scanners.Count == 0)
+    {
+        <div class="alert alert-info text-center">
+            @Localizer["NoScanners"]
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-danger">Failed to load network interfaces.</div>
+}
+
+@code {
+    private List<NetworkInterfaceInfo>? interfaces;
+    private bool loadingInterfaces = true;
+    private List<Guid> scanners = new List<Guid>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            interfaces = await Http.GetFromJsonAsync<List<NetworkInterfaceInfo>>("api/scanner/interfaces");
+            // Add initial scanner
+            AddScanner();
+        }
+        catch (Exception)
+        {
+            // Handle error
+        }
+        finally
+        {
+            loadingInterfaces = false;
+        }
+    }
+
+    private void AddScanner()
+    {
+        scanners.Add(Guid.NewGuid());
+    }
+
+    private void RemoveScanner(Guid id)
+    {
+        scanners.Remove(id);
+    }
+}

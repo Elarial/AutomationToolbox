@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Automation Toolbox</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Accueil</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Outils</value>
+  </data>
+  <data name="Weather" xml:space="preserve">
+    <value>Météo</value>
+  </data>
+  <data name="JsonFormatterTitle" xml:space="preserve">
+    <value>Formateur JSON</value>
+  </data>
+  <data name="JsonFormatterDesc" xml:space="preserve">
+    <value>Formater et valider du JSON.</value>
+  </data>
+  <data name="GuidGeneratorTitle" xml:space="preserve">
+    <value>Générateur de GUID</value>
+  </data>
+  <data name="GuidGeneratorDesc" xml:space="preserve">
+    <value>Générer des identifiants uniques (GUIDs).</value>
+  </data>
+  <data name="Base64EncoderTitle" xml:space="preserve">
+    <value>Encodeur/Décodeur Base64</value>
+  </data>
+  <data name="Base64EncoderDesc" xml:space="preserve">
+    <value>Encoder ou décoder en Base64.</value>
+  </data>
+  <data name="NumberFormatConverterTitle" xml:space="preserve">
+    <value>Convertisseur de Nombres</value>
+  </data>
+  <data name="NumberFormatConverterDesc" xml:space="preserve">
+    <value>Convertir entre binaire, octal, décimal, hex et IEEE 754.</value>
+  </data>
+  <data name="AddConverter" xml:space="preserve">
+    <value>Ajouter un convertisseur</value>
+  </data>
+  <data name="Converter" xml:space="preserve">
+    <value>Convertisseur</value>
+  </data>
+  <data name="RemoveConverter" xml:space="preserve">
+    <value>Supprimer le convertisseur</value>
+  </data>
+  <data name="InputNumber" xml:space="preserve">
+    <value>Nombre en entrée</value>
+  </data>
+  <data name="Base" xml:space="preserve">
+    <value>Base</value>
+  </data>
+  <data name="Binary" xml:space="preserve">
+    <value>Binaire</value>
+  </data>
+  <data name="Octal" xml:space="preserve">
+    <value>Octal</value>
+  </data>
+  <data name="Decimal" xml:space="preserve">
+    <value>Décimal</value>
+  </data>
+  <data name="Hexadecimal" xml:space="preserve">
+    <value>Hexadécimal</value>
+  </data>
+  <data name="Hex" xml:space="preserve">
+    <value>Hex</value>
+  </data>
+  <data name="IEEE754" xml:space="preserve">
+    <value>Flottant (IEEE 754)</value>
+  </data>
+  <data name="NoConverters" xml:space="preserve">
+    <value>Aucun convertisseur actif. Cliquez sur 'Ajouter un convertisseur' pour commencer.</value>
+  </data>
+  <data name="InvalidInput" xml:space="preserve">
+    <value>Entrée invalide pour {0}.</value>
+  </data>
+  <data name="ValueOverflow" xml:space="preserve">
+    <value>Dépassement</value>
+  </data>
+  <!-- IP Scanner -->
+  <data name="IpScannerTitle" xml:space="preserve">
+    <value>Scanner IP</value>
+  </data>
+  <data name="IpScannerDesc" xml:space="preserve">
+    <value>Scanner le réseau pour découvrir des appareils et des ports ouverts.</value>
+  </data>
+  <data name="AddScanner" xml:space="preserve">
+    <value>Ajouter un scanner</value>
+  </data>
+  <data name="RemoveScanner" xml:space="preserve">
+    <value>Supprimer le scanner</value>
+  </data>
+  <data name="ScannerConfiguration" xml:space="preserve">
+    <value>Configuration</value>
+  </data>
+  <data name="NetworkInterface" xml:space="preserve">
+    <value>Interface Réseau</value>
+  </data>
+  <data name="SelectInterface" xml:space="preserve">
+    <value>Sélectionner une interface...</value>
+  </data>
+  <data name="IpRange" xml:space="preserve">
+    <value>Plage IP</value>
+  </data>
+  <data name="Ports" xml:space="preserve">
+    <value>Ports</value>
+  </data>
+  <data name="Timeout" xml:space="preserve">
+    <value>Délai (ms)</value>
+  </data>
+  <data name="StartScan" xml:space="preserve">
+    <value>Lancer le scan</value>
+  </data>
+  <data name="Scanning" xml:space="preserve">
+    <value>Scan en cours...</value>
+  </data>
+  <data name="ShowOffline" xml:space="preserve">
+    <value>Afficher les appareils hors ligne</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Résultats</value>
+  </data>
+  <data name="NoDevicesFound" xml:space="preserve">
+    <value>Aucun appareil trouvé dans la plage sélectionnée.</value>
+  </data>
+  <data name="ScanPorts" xml:space="preserve">
+    <value>Scanner les ports</value>
+  </data>
+  <data name="InvalidIpRange" xml:space="preserve">
+    <value>Format de plage IP invalide.</value>
+  </data>
+  <data name="InvalidPortRange" xml:space="preserve">
+    <value>Format de plage de ports invalide.</value>
+  </data>
+  <data name="NoScanners" xml:space="preserve">
+    <value>Aucun scanner actif. Cliquez sur « Ajouter un scanner » pour commencer.</value>
+  </data>
+</root>

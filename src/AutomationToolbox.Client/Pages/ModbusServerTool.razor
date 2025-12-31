@@ -1,0 +1,314 @@
+@page "/tools/modbus-server"
+@using AutomationToolbox.Core.Models
+@using AutomationToolbox.Client.Services
+@inject IModbusServerClientService ModbusService
+@inject Microsoft.Extensions.Localization.IStringLocalizer<App> Localizer
+
+<h3>Modbus TCP Server</h3>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">Add New Server</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" @bind="newServer.Name" placeholder="My Server" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Network Interface</label>
+                    <select class="form-select" @bind="newServer.IpAddress">
+                        @foreach (var iface in interfaces)
+                        {
+                            <option value="@iface.IpAddress">@iface.Name (@iface.IpAddress)</option>
+                        }
+                        <option value="0.0.0.0">Any (0.0.0.0)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Port</label>
+                    <input type="number" class="form-control" @bind="newServer.Port" />
+                </div>
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger">@errorMessage</div>
+                }
+                <button class="btn btn-primary w-100" @onclick="StartServer">Start Server</button>
+            </div>
+        </div>
+
+        <div class="list-group">
+            @foreach (var server in servers)
+            {
+                <button type="button" class="list-group-item list-group-item-action @(selectedServer?.Id == server.Id ? "active" : "")" @onclick="() => SelectServer(server)">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">@server.Name</h5>
+                        <small>Port: @server.Port</small>
+                    </div>
+                    <p class="mb-1">@server.IpAddress</p>
+                    <span class="badge bg-success">Running</span>
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        @if (selectedServer != null)
+        {
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Manage Server: @selectedServer.Name</span>
+                    <button class="btn btn-danger btn-sm" @onclick="StopServer">Stop Server</button>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link @(activeTab == "simulation" ? "active" : "")" href="#" @onclick='() => SetTab("simulation")' @onclick:preventDefault>Simulation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(activeTab == "monitor" ? "active" : "")" href="#" @onclick='() => SetTab("monitor")' @onclick:preventDefault>Monitor</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(activeTab == "logs" ? "active" : "")" href="#" @onclick='() => SetTab("logs")' @onclick:preventDefault>Traffic Logs</a>
+                        </li>
+                    </ul>
+
+                    @if (activeTab == "simulation")
+                    {
+                        <h5>Update Register Value</h5>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-3">
+                                <select class="form-select" @bind="updateType">
+                                    <option value="@ModbusDataType.Coil">Coil (0x)</option>
+                                    <option value="@ModbusDataType.DiscreteInput">Discrete Input (1x)</option>
+                                    <option value="@ModbusDataType.InputRegister">Input Register (3x)</option>
+                                    <option value="@ModbusDataType.HoldingRegister">Holding Register (4x)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" class="form-control" placeholder="Address (1-65535)" @bind="updateAddress" />
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" class="form-control" placeholder="Value" @bind="updateValue" />
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-success w-100" @onclick="UpdateData">Update</button>
+                            </div>
+                        </div>
+                        <hr/>
+                         <h5>Helper</h5>
+                        <button class="btn btn-outline-secondary" @onclick="RandomizeValues">Randomize Range (1-10)</button>
+                    }
+
+                    @if (activeTab == "monitor")
+                    {
+                        <div class="row g-2 mb-3">
+                             <div class="col-md-4">
+                                <select class="form-select" @bind="monitorType">
+                                    <option value="@ModbusDataType.Coil">Coil (0x)</option>
+                                    <option value="@ModbusDataType.DiscreteInput">Discrete Input (1x)</option>
+                                    <option value="@ModbusDataType.InputRegister">Input Register (3x)</option>
+                                    <option value="@ModbusDataType.HoldingRegister">Holding Register (4x)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" class="form-control" placeholder="Start Addr" @bind="monitorStart" />
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" class="form-control" placeholder="Count" @bind="monitorCount" />
+                            </div>
+                        </div>
+
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Address</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < monitoredValues.Length; i++)
+                                    {
+                                        <tr>
+                                            <td>@(monitorStart + i)</td>
+                                            <td>@monitoredValues[i]</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="text-muted">Auto-refreshing every 2s...</small>
+                    }
+
+                    @if (activeTab == "logs")
+                    {
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-sm text-monospace">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var log in logs)
+                                    {
+                                        <tr>
+                                            <td>@log.Timestamp.ToString("HH:mm:ss.fff")</td>
+                                            <td>@log.Message</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="text-muted">Auto-refreshing every 2s...</small>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">Select a server to manage or create a new one.</div>
+        }
+    </div>
+</div>
+
+@code {
+    private IEnumerable<ModbusServerConfig> servers = new List<ModbusServerConfig>();
+    private IEnumerable<NetworkInterfaceInfo> interfaces = new List<NetworkInterfaceInfo>();
+    
+    private ModbusServerConfig newServer = new ModbusServerConfig { Name = "New Server", Port = 502, IpAddress="0.0.0.0" };
+    private ModbusServerConfig? selectedServer;
+    private string errorMessage = "";
+    private string activeTab = "simulation";
+
+    // Simulation
+    private ModbusDataType updateType = ModbusDataType.HoldingRegister;
+    private int updateAddress = 1;
+    private ushort updateValue = 0;
+
+    // Monitor
+    private ModbusDataType monitorType = ModbusDataType.HoldingRegister;
+    private int monitorStart = 1;
+    private int monitorCount = 10;
+    private ushort[] monitoredValues = Array.Empty<ushort>();
+
+    // Logs
+    private IEnumerable<ModbusLogEntry> logs = new List<ModbusLogEntry>();
+
+    private System.Threading.Timer? refreshTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadServers();
+        try 
+        {
+            interfaces = await ModbusService.GetInterfacesAsync();
+        } 
+        catch (Exception ex) 
+        {
+             // Handle offline/error gracefully
+             Console.WriteLine(ex.Message);
+        }
+        
+        refreshTimer = new System.Threading.Timer(async _ => await RefreshData(), null, 2000, 2000);
+    }
+
+    private async Task LoadServers()
+    {
+        try
+        {
+             servers = await ModbusService.GetAllServersAsync();
+             StateHasChanged();
+        }
+        catch {} // Handle errors
+    }
+
+    private async Task StartServer()
+    {
+        errorMessage = "";
+        try
+        {
+            var created = await ModbusService.StartServerAsync(newServer);
+            newServer = new ModbusServerConfig { Name = "New Server", Port = newServer.Port + 1, IpAddress = newServer.IpAddress }; // Increment port for convenience
+            await LoadServers();
+            SelectServer(created);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to start server: " + ex.Message;
+        }
+    }
+
+    private void SelectServer(ModbusServerConfig server)
+    {
+        selectedServer = server;
+        errorMessage = "";
+        // Reset view data
+        monitoredValues = Array.Empty<ushort>();
+        logs = new List<ModbusLogEntry>();
+    }
+
+    private async Task StopServer()
+    {
+        if (selectedServer != null)
+        {
+            await ModbusService.StopServerAsync(selectedServer.Id);
+            selectedServer = null;
+            await LoadServers();
+        }
+    }
+
+    private void SetTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    private async Task UpdateData()
+    {
+        if (selectedServer != null)
+        {
+            await ModbusService.UpdateDataAsync(selectedServer.Id, updateType, updateAddress, updateValue);
+        }
+    }
+
+    private async Task RandomizeValues()
+    {
+        if (selectedServer != null)
+        {
+            var rand = new Random();
+            for (int i = 1; i <= 10; i++)
+            {
+                await ModbusService.UpdateDataAsync(selectedServer.Id, updateType, i, (ushort)rand.Next(0, 1000));
+            }
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        if (selectedServer != null)
+        {
+            if (activeTab == "monitor")
+            {
+                try 
+                {
+                    monitoredValues = await ModbusService.GetDataAsync(selectedServer.Id, monitorType, monitorStart, monitorCount);
+                } catch { } // polling
+            }
+            else if (activeTab == "logs")
+            {
+                try
+                {
+                    logs = await ModbusService.GetLogsAsync(selectedServer.Id);
+                } catch { }
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        refreshTimer?.Dispose();
+    }
+}

@@ -1,0 +1,31 @@
+@inject IJSRuntime JSRuntime
+
+<button class="btn btn-outline-secondary" @onclick="ToggleTheme" title="Toggle theme">
+    <i class="@(isDark ? "fa-solid fa-sun" : "fa-solid fa-moon")"></i>
+</button>
+
+@code {
+    private bool isDark = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var theme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", new object[] { "theme" });
+        if (theme == "dark")
+        {
+            isDark = true;
+            await ApplyTheme(isDark);
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        isDark = !isDark;
+        await ApplyTheme(isDark);
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "theme", isDark ? "dark" : "light");
+    }
+
+    private async Task ApplyTheme(bool dark)
+    {
+        await JSRuntime.InvokeVoidAsync("document.documentElement.setAttribute", "data-theme", dark ? "dark" : "light");
+    }
+}

@@ -1,0 +1,48 @@
+@page "/tools/number-format-converter"
+@using AutomationToolbox.Client.Shared
+@inject Microsoft.Extensions.Localization.IStringLocalizer<App> Localizer
+
+<PageTitle>@Localizer["NumberFormatConverterTitle"]</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@Localizer["NumberFormatConverterTitle"]</h1>
+    <button class="btn btn-primary" @onclick="AddConverter">
+        <i class="fa-solid fa-plus"></i> @Localizer["AddConverter"]
+    </button>
+</div>
+
+<div class="row">
+    @foreach (var converter in converters)
+    {
+        <div class="col-md-6 col-lg-6">
+            <NumberFormatConverterCard OnRemove="() => RemoveConverter(converter)" />
+        </div>
+    }
+</div>
+
+@if (converters.Count == 0)
+{
+    <div class="alert alert-info text-center">
+        @Localizer["NoConverters"]
+    </div>
+}
+
+@code {
+    private List<Guid> converters = new List<Guid>();
+
+    protected override void OnInitialized()
+    {
+        // Start with one converter by default
+        AddConverter();
+    }
+
+    private void AddConverter()
+    {
+        converters.Add(Guid.NewGuid());
+    }
+
+    private void RemoveConverter(Guid id)
+    {
+        converters.Remove(id);
+    }
+}

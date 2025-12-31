@@ -1,0 +1,54 @@
+@page "/tools"
+@using AutomationToolbox.Core.Interfaces
+@using AutomationToolbox.Core.Models
+@inject IToolService ToolService
+@inject Microsoft.Extensions.Localization.IStringLocalizer<App> Localizer
+
+<PageTitle>@Localizer["Tools"]</PageTitle>
+
+<h1>@Localizer["Tools"]</h1>
+
+<p>@Localizer["SelectTool"]</p>
+
+@if (tools == null)
+{
+    <p><em>@Localizer["Loading"]</em></p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var tool in tools)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="@tool.Icon fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">@Localizer[tool.Name]</h5>
+                        <p class="card-text">@Localizer[tool.Description]</p>
+                        <a href="@tool.Url" class="btn btn-primary">@Localizer["OpenTool"]</a>
+                    </div>
+                    <div class="card-footer text-muted">
+                        @Localizer[tool.Category]
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// The list of available automation tools to display.
+    /// Loaded asynchronously when the component initializes.
+    /// </summary>
+    private IEnumerable<ToolDefinition>? tools;
+
+    /// <summary>
+    /// Lifecycle method called when the component is ready to start.
+    /// Retreives the tools from the IToolService.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        tools = await ToolService.GetToolsAsync();
+    }
+}

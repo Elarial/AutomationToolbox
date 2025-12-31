@@ -1,0 +1,315 @@
+@implements IDisposable
+@using AutomationToolbox.Core.Models
+@using AutomationToolbox.Core.Interfaces
+@inject HttpClient Http
+@inject Microsoft.Extensions.Localization.IStringLocalizer<App> Localizer
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fa-solid fa-gear me-2"></i> @Localizer["ScannerConfiguration"]</span>
+        <button class="btn btn-sm btn-outline-danger" @onclick="OnRemove" title="@Localizer["RemoveScanner"]">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label"><i class="fa-solid fa-network-wired me-1"></i> @Localizer["NetworkInterface"]</label>
+                <select class="form-select @(string.IsNullOrEmpty(selectedInterfaceIp) ? "is-invalid" : "")" @onchange="OnInterfaceChanged">
+                    <option value="">@Localizer["SelectInterface"]</option>
+                    @if (AvailableInterfaces != null)
+                    {
+                         @foreach (var nic in AvailableInterfaces)
+                        {
+                            <option value="@nic.IpAddress" selected="@(nic.IpAddress == selectedInterfaceIp)">@nic.Name (@nic.IpAddress)</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label"><i class="fa-solid fa-arrow-down-9-1 me-1"></i> @Localizer["IpRange"]</label>
+                <input type="text" class="form-control @(invalidIpRange ? "is-invalid" : "")" @bind="customIpRange" @bind:after="ValidateInputs" placeholder="e.g. 192.168.1.10-50" />
+                @if (invalidIpRange)
+                {
+                    <div class="invalid-feedback">@Localizer["InvalidIpRange"]</div>
+                }
+            </div>
+            <div class="col-md-3">
+                <label class="form-label"><i class="fa-solid fa-door-open me-1"></i> @Localizer["Ports"]</label>
+                <input type="text" class="form-control @(invalidPortRange ? "is-invalid" : "")" @bind="customPortRange" @bind:after="ValidateInputs" placeholder="e.g. 80, 443" />
+                @if (invalidPortRange)
+                {
+                    <div class="invalid-feedback">@Localizer["InvalidPortRange"]</div>
+                }
+            </div>
+             <div class="col-md-2">
+                <label class="form-label"><i class="fa-solid fa-clock me-1"></i> @Localizer["Timeout"]</label>
+                <input type="number" class="form-control" @bind="timeoutMs" min="10" />
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mt-4">
+             <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="showOffline-@Id" @bind="showOffline">
+                <label class="form-check-label" for="showOffline-@Id">
+                    @Localizer["ShowOffline"]
+                </label>
+            </div>
+             <button class="btn btn-primary" @onclick="StartScan" disabled="@(isScanning || string.IsNullOrEmpty(selectedInterfaceIp) || invalidIpRange || invalidPortRange)">
+                @if (isScanning)
+                {
+                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    <span>@Localizer["Scanning"]</span>
+                }
+                else
+                {
+                    <span><i class="fa-solid fa-search me-1"></i> @Localizer["StartScan"]</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (errorMsg != null)
+{
+    <div class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i> @errorMsg
+    </div>
+}
+
+@if (scanResults != null)
+{
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>
+                 <i class="fa-solid fa-list-ul me-2"></i> @Localizer["Results"] (@scanResults.Count)
+            </span>
+             <button class="btn btn-sm btn-link text-decoration-none" @onclick="ToggleResults">
+                <i class="fa-solid @(resultsCollapsed ? "fa-chevron-down" : "fa-chevron-up")"></i>
+            </button>
+        </div>
+        @if (!resultsCollapsed)
+        {
+        <div class="card-body p-0">
+            @if (scanResults.Any())
+            {
+                <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Hostname</th>
+                            <th>MAC Address</th>
+                            <th>Status</th>
+                            <th>Open Ports</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var result in scanResults)
+                        {
+                            <tr>
+                                <td>@result.IpAddress</td>
+                                <td>@result.Hostname</td>
+                                <td>@result.MacAddress</td>
+                                <td>
+                                    @if (result.IsUp)
+                                    {
+                                        <span class="badge bg-success">UP</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">DOWN</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (portResults.ContainsKey(result.IpAddress))
+                                    {
+                                        var ports = portResults[result.IpAddress].OpenPorts;
+                                        if (ports.Any())
+                                        {
+                                            @foreach (var p in ports)
+                                            {
+                                                <span class="badge bg-secondary me-1">@p</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted text-small">None</span>
+                                        }
+                                    }
+                                    else if (scanningPorts.Contains(result.IpAddress))
+                                    {
+                                        <span class="spinner-border spinner-border-sm text-secondary"></span>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-link text-decoration-none" @onclick="() => ScanPorts(result.IpAddress)">@Localizer["ScanPorts"]</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-center text-muted">
+                    <i class="fa-solid fa-ban fa-2x mb-2"></i>
+                    <p>@Localizer["NoDevicesFound"]</p>
+                </div>
+            }
+        </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [Parameter] public List<NetworkInterfaceInfo>? AvailableInterfaces { get; set; }
+    [Parameter] public EventCallback OnRemove { get; set; }
+
+    private string selectedInterfaceIp = "";
+    private string customIpRange = "";
+    private string customPortRange = "";
+    private int timeoutMs = 500;
+    private bool showOffline = false;
+    
+    private bool isScanning = false;
+    private bool invalidIpRange = false;
+    private bool invalidPortRange = false;
+    private bool resultsCollapsed = false;
+    
+    private string? errorMsg;
+    private List<ScanResult>? scanResults;
+    private Dictionary<string, PortResult> portResults = new();
+    private HashSet<string> scanningPorts = new();
+    
+    private CancellationTokenSource? cts;
+
+    private void ToggleResults()
+    {
+        resultsCollapsed = !resultsCollapsed;
+    }
+
+    private void OnInterfaceChanged(ChangeEventArgs e)
+    {
+        selectedInterfaceIp = e.Value?.ToString() ?? "";
+        scanResults = null;
+        portResults.Clear();
+    }
+    
+    private void ValidateInputs()
+    {
+        // Simple regex or logic validation
+        invalidIpRange = !string.IsNullOrEmpty(customIpRange) && !IsValidIpRange(customIpRange);
+        invalidPortRange = !string.IsNullOrEmpty(customPortRange) && !IsValidPortRange(customPortRange);
+    }
+
+    private bool IsValidIpRange(string range)
+    {
+        // Allow single IP "1.2.3.4" or range "1.2.3.4-10" or "1.2.3.4-1.2.3.20"
+        // Minimal validation for user feedback
+        return System.Text.RegularExpressions.Regex.IsMatch(range, @"^[\d\.\-]+$");
+    }
+
+     private bool IsValidPortRange(string range)
+    {
+        // Allow "80, 443, 500-600"
+        return System.Text.RegularExpressions.Regex.IsMatch(range, @"^[\d\s,\-]+$");
+    }
+    
+    public void Dispose()
+    {
+        CancelScan();
+    }
+
+    private void CancelScan()
+    {
+        cts?.Cancel();
+        cts?.Dispose();
+        cts = null;
+        isScanning = false;
+    }
+
+    private async Task StartScan()
+    {
+        ValidateInputs();
+        if (string.IsNullOrEmpty(selectedInterfaceIp) || invalidIpRange || invalidPortRange) return;
+
+        CancelScan();
+        cts = new CancellationTokenSource();
+        isScanning = true;
+        errorMsg = null;
+        scanResults = null;
+        portResults.Clear();
+        resultsCollapsed = false;
+
+        try
+        {
+            var query = $"api/scanner/subnet?interfaceIp={selectedInterfaceIp}&includeDown={showOffline}&timeoutMs={timeoutMs}";
+            if (!string.IsNullOrWhiteSpace(customIpRange))
+            {
+                query += $"&range={Uri.EscapeDataString(customIpRange)}";
+            }
+
+            var results = await Http.GetFromJsonAsync<List<ScanResult>>(query, cts.Token);
+            scanResults = results?.OrderBy(r => System.Version.TryParse(r.IpAddress, out var v) ? v : new System.Version(0,0,0,0)).ToList();
+            
+            if (scanResults != null)
+            {
+                 // Auto port scan only UP devices by default
+                 var portTasks = scanResults.Where(r => r.IsUp).Select(res => ScanPorts(res.IpAddress));
+                 _ = Task.WhenAll(portTasks);
+            }
+
+        }
+        catch (OperationCanceledException)
+        {
+            // Scan cancelled
+        }
+        catch (Exception ex)
+        {
+            if (!cts.IsCancellationRequested)
+                errorMsg = $"Scan failed: {ex.Message}";
+        }
+        finally
+        {
+            if (cts != null && !cts.IsCancellationRequested)
+            {
+                isScanning = false;
+            }
+        }
+    }
+
+    private async Task ScanPorts(string ip)
+    {
+        if (scanningPorts.Contains(ip) || cts == null || cts.IsCancellationRequested) return;
+        scanningPorts.Add(ip);
+        StateHasChanged();
+
+        try
+        {
+             var query = $"api/scanner/ports?ip={ip}&timeoutMs={timeoutMs}";
+             if (!string.IsNullOrWhiteSpace(customPortRange))
+             {
+                 query += $"&range={Uri.EscapeDataString(customPortRange)}";
+             }
+             
+             var result = await Http.GetFromJsonAsync<PortResult>(query, cts.Token);
+             if (result != null)
+             {
+                 portResults[ip] = result;
+             }
+        }
+        catch
+        {
+             // ignore failure
+        }
+        finally
+        {
+            scanningPorts.Remove(ip);
+            StateHasChanged();
+        }
+    }
+}

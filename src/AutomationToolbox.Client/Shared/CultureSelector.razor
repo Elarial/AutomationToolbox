@@ -1,0 +1,24 @@
+@using System.Globalization
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+
+<select class="form-select w-auto d-inline-block" @onchange="OnSelected">
+    <option value="en-US" selected="@(CultureInfo.CurrentCulture.Name == "en-US")">English</option>
+    <option value="fr-FR" selected="@(CultureInfo.CurrentCulture.Name == "fr-FR")">Français</option>
+</select>
+
+@code {
+    private async Task OnSelected(ChangeEventArgs e)
+    {
+        var culture = e.Value?.ToString();
+        var uri = new Uri(NavManager.Uri)
+            .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var query = $"?culture={Uri.EscapeDataString(culture ?? "en-US")}";
+        
+        // Persist to local storage
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "culture", culture);
+
+        // Force reload to apply culture
+        NavManager.NavigateTo(uri, forceLoad: true);
+    }
+}

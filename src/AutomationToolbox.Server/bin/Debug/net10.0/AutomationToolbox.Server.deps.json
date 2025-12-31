@@ -1,0 +1,183 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "AutomationToolbox.Server/1.0.0": {
+        "dependencies": {
+          "AutomationToolbox.Client": "1.0.0",
+          "AutomationToolbox.Core": "1.0.0",
+          "Microsoft.AspNetCore.Components.WebAssembly.Server": "10.0.1",
+          "Microsoft.AspNetCore.OpenApi": "10.0.0",
+          "NModbus": "3.0.81"
+        },
+        "runtime": {
+          "AutomationToolbox.Server.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Components.WebAssembly/10.0.1": {
+        "dependencies": {
+          "Microsoft.JSInterop.WebAssembly": "10.0.1"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Components.WebAssembly.dll": {
+            "assemblyVersion": "10.0.1.0",
+            "fileVersion": "10.0.125.57005"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Components.WebAssembly.Server/10.0.1": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.1"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Components.WebAssembly.Server.dll": {
+            "assemblyVersion": "10.0.1.0",
+            "fileVersion": "10.0.125.57005"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.OpenApi/10.0.0": {
+        "dependencies": {
+          "Microsoft.OpenApi": "2.0.0"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.OpenApi.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.52411"
+          }
+        }
+      },
+      "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.101": {
+        "runtime": {
+          "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll": {
+            "assemblyVersion": "10.0.101.0",
+            "fileVersion": "10.1.125.57005"
+          }
+        }
+      },
+      "Microsoft.JSInterop.WebAssembly/10.0.1": {
+        "runtime": {
+          "lib/net10.0/Microsoft.JSInterop.WebAssembly.dll": {
+            "assemblyVersion": "10.0.1.0",
+            "fileVersion": "10.0.125.57005"
+          }
+        }
+      },
+      "Microsoft.OpenApi/2.0.0": {
+        "runtime": {
+          "lib/net8.0/Microsoft.OpenApi.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          }
+        }
+      },
+      "NModbus/3.0.81": {
+        "runtime": {
+          "lib/net6.0/NModbus.dll": {
+            "assemblyVersion": "3.0.81.0",
+            "fileVersion": "3.0.81.0"
+          }
+        }
+      },
+      "AutomationToolbox.Client/1.0.0": {
+        "dependencies": {
+          "AutomationToolbox.Core": "1.0.0",
+          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.1",
+          "Microsoft.DotNet.HotReload.WebAssembly.Browser": "10.0.101"
+        },
+        "runtime": {
+          "AutomationToolbox.Client.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        },
+        "resources": {
+          "en/AutomationToolbox.Client.resources.dll": {
+            "locale": "en"
+          },
+          "fr/AutomationToolbox.Client.resources.dll": {
+            "locale": "fr"
+          }
+        }
+      },
+      "AutomationToolbox.Core/1.0.0": {
+        "runtime": {
+          "AutomationToolbox.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AutomationToolbox.Server/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.AspNetCore.Components.WebAssembly/10.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qh5mkVhHCv/fxPl8XCIwx+ea9uLeTbbVs2rzgvWkWX0EgYLITEEH3AbX6OuvDW8UQVETjio2UZOh6JDAO2A4Lw==",
+      "path": "microsoft.aspnetcore.components.webassembly/10.0.1",
+      "hashPath": "microsoft.aspnetcore.components.webassembly.10.0.1.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Components.WebAssembly.Server/10.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fl9r0e2VGWcMgwBlGGVUFv84o8k1X6pxh9X3Ph6f5/hU8feqFpeqC9K9OrBXd7JhMD49GoLOl5jZW3pdp+9Fog==",
+      "path": "microsoft.aspnetcore.components.webassembly.server/10.0.1",
+      "hashPath": "microsoft.aspnetcore.components.webassembly.server.10.0.1.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.OpenApi/10.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0aqIF1t+sA2T62LIeMtXGSiaV7keGQaJnvwwmu+htQdjCaKYARfXAeqp4nHH9y2etpilyZ/tnQzZg4Ilmo/c4Q==",
+      "path": "microsoft.aspnetcore.openapi/10.0.0",
+      "hashPath": "microsoft.aspnetcore.openapi.10.0.0.nupkg.sha512"
+    },
+    "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.101": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-30d2d7ti8GiDYf9zg4+w5cvH3jm9HAQMyXzZgCVpEjmh3WLErJazuu2tyoIO75uNYLWPD/NNTTRD9SoPpDiACw==",
+      "path": "microsoft.dotnet.hotreload.webassembly.browser/10.0.101",
+      "hashPath": "microsoft.dotnet.hotreload.webassembly.browser.10.0.101.nupkg.sha512"
+    },
+    "Microsoft.JSInterop.WebAssembly/10.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-oIkAEHUSFduhX7scm0+RXODv7FtA/D0KaGW0dPmO1W6LL//VLHjS+pzhpgsS6fBQ+RZfOEFaTLkZewqi6xt8rw==",
+      "path": "microsoft.jsinterop.webassembly/10.0.1",
+      "hashPath": "microsoft.jsinterop.webassembly.10.0.1.nupkg.sha512"
+    },
+    "Microsoft.OpenApi/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw==",
+      "path": "microsoft.openapi/2.0.0",
+      "hashPath": "microsoft.openapi.2.0.0.nupkg.sha512"
+    },
+    "NModbus/3.0.81": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-EzKEp7CHD8ErBL36iMts+6IrZZ9FEqllaD7Y5XzhoRjlxt5yXRughQ1bxPs99QFYFkW5xfkANB0Qs1gAmYGP8Q==",
+      "path": "nmodbus/3.0.81",
+      "hashPath": "nmodbus.3.0.81.nupkg.sha512"
+    },
+    "AutomationToolbox.Client/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AutomationToolbox.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
